@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sole Economics · Dashboard 2023</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:       #fdf6ee;
+    --surface:  #ffffff;
+    --card:     #ffffff;
+    --border:   #f0e4d4;
+    --accent:   #f97316;
+    --accent2:  #fb923c;
+    --accent3:  #fdba74;
+    --text:     #1c1109;
+    --muted:    #9a7c5f;
+    --positive: #16a34a;
+    --negative: #dc2626;
+    --nike:     #f97316;
+    --jordan:   #dc2626;
+    --adidas:   #2563eb;
+    --nb:       #16a34a;
+    --crocs:    #ca8a04;
+    --puma:     #7c3aed;
+    --converse: #0891b2;
+    --ugg:      #be185d;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-ui:      'Barlow Condensed', sans-serif;
+    --font-body:    'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: linear-gradient(160deg, #fdf6ee 0%, #fff7ed 50%, #fef3c7 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 64px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(249,115,22,.08);
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--text);
+  }
+  .logo span { color: var(--accent); }
+
+  .badge {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--accent), #fb923c);
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+
+  .header-right { display: flex; align-items: center; gap: 16px; }
+
+  .source-tag {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .tabs-wrap {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    gap: 0;
+  }
+
+  .tab {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 16px 24px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  main { padding: 28px 32px 48px; }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 38px;
+    letter-spacing: 2px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .section-sub {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow .2s, transform .2s;
+    box-shadow: 0 2px 8px rgba(249,115,22,.06);
+  }
+  .kpi-card:hover { box-shadow: 0 8px 28px rgba(249,115,22,.14); transform: translateY(-2px); }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, var(--accent), var(--accent3));
+    border-radius: 18px 0 0 18px;
+  }
+
+  .kpi-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-family: var(--font-display);
+    font-size: 30px;
+    letter-spacing: 1px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .kpi-sub {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .kpi-card.accent .kpi-value { color: var(--accent); }
+  .kpi-card.positive .kpi-value { color: var(--positive); }
+
+  .chart-grid { display: grid; gap: 16px; margin-bottom: 16px; }
+  .col-2 { grid-template-columns: 1fr 1fr; }
+  .col-3 { grid-template-columns: 2fr 1fr; }
+  .col-3r { grid-template-columns: 1fr 2fr; }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 24px;
+    box-shadow: 0 2px 8px rgba(249,115,22,.05);
+  }
+
+  .chart-title {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chart-title::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  canvas { width: 100% !important; }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(240,228,212,.6);
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(249,115,22,.04); border-radius: 8px; }
+
+  .rank-num {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--border);
+    width: 32px;
+    display: inline-block;
+  }
+  .rank-num.top3 { color: var(--accent); }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .pill.jordan   { background: rgba(220,38,38,.12);  color: #dc2626; }
+  .pill.nike     { background: rgba(249,115,22,.12); color: var(--accent); }
+  .pill.adidas   { background: rgba(37,99,235,.12);  color: #2563eb; }
+  .pill.nb       { background: rgba(22,163,74,.12);  color: #16a34a; }
+  .pill.crocs    { background: rgba(202,138,4,.12);  color: #ca8a04; }
+  .pill.puma     { background: rgba(124,58,237,.12); color: #7c3aed; }
+  .pill.converse { background: rgba(8,145,178,.12);  color: #0891b2; }
+  .pill.other    { background: rgba(154,124,95,.12); color: var(--muted); }
+
+  .premium-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .premium-bar {
+    height: 5px;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    border-radius: 4px;
+    min-width: 2px;
+  }
+  .premium-val {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* SCATTER TOOLTIP */
+  #scatter-tooltip {
+    position: fixed;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-size: 11px;
+    pointer-events: none;
+    display: none;
+    z-index: 200;
+    max-width: 240px;
+    box-shadow: 0 8px 32px rgba(249,115,22,.14);
+  }
+  #scatter-tooltip strong {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--accent);
+  }
+  #scatter-tooltip span { color: var(--muted); }
+
+  /* FILTER */
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .filter-btn {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* QUADRANT LEGEND */
+  .quadrant-legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .ql-item {
+    background: #fdf6ee;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .ql-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+  .ql-title {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .ql-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* INSIGHT CARDS */
+  .insight-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .insight-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(249,115,22,.05);
+  }
+  .insight-card .ic-num {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1;
+    color: var(--accent);
+  }
+  .insight-card .ic-label {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .insight-card .ic-body {
+    font-size: 12px;
+    color: var(--text);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* COMP CARDS */
+  .comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .comp-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 24px;
+    box-shadow: 0 2px 8px rgba(249,115,22,.05);
+  }
+  .comp-header {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .comp-header .type-badge {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .leader { border-color: var(--accent); }
+  .leader .type-badge { background: rgba(249,115,22,.15); color: var(--accent); }
+  .emergent { border-color: var(--accent2); }
+  .emergent .type-badge { background: rgba(251,146,60,.15); color: var(--accent2); }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(240,228,212,.6);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-key {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .stat-val { font-family: var(--font-display); font-size: 22px; letter-spacing: 1px; }
+
+  /* DEMAND BARS */
+  .demand-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(240,228,212,.5);
+  }
+  .demand-bar-row:last-child { border-bottom: none; }
+  .demand-brand-label {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    width: 90px;
+    flex-shrink: 0;
+    color: var(--text);
+  }
+  .demand-bars { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .demand-bar-track { display: flex; align-items: center; gap: 6px; }
+  .demand-bar-fill {
+    height: 8px;
+    border-radius: 6px;
+    min-width: 2px;
+    transition: width .4s;
+  }
+  .demand-bar-fill.bids { background: linear-gradient(90deg, var(--accent), var(--accent3)); }
+  .demand-bar-fill.asks { background: linear-gradient(90deg, #94a3b8, #cbd5e1); }
+  .demand-bar-val {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .demand-legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .demand-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .demand-legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* CORR CARD */
+  .corr-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(240,228,212,.5);
+  }
+  .corr-item:last-child { border-bottom: none; }
+  .corr-bar-track {
+    width: 80px;
+    height: 8px;
+    background: var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .corr-bar-fill { height: 100%; border-radius: 6px; }
+  .corr-val {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--muted);
+    width: 56px;
+    flex-shrink: 0;
+  }
+  .corr-label { font-family: var(--font-ui); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .corr-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent3); border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    header { padding: 0 16px; }
+    main { padding: 20px 16px 48px; }
+    .tabs-wrap { padding: 0 16px; overflow-x: auto; }
+    .chart-grid.col-2, .chart-grid.col-3, .chart-grid.col-3r { grid-template-columns: 1fr; }
+    .comp-grid { grid-template-columns: 1fr; }
+    .insight-row { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .quadrant-legend { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="scatter-tooltip"></div>
+
+<header>
+  <div class="logo">SOLE <span>ECONOMICS</span></div>
+  <div class="header-right">
+    <span class="source-tag">StockX · 2023</span>
+    <span class="badge">Dashboard</span>
+  </div>
+</header>
+
+<div class="tabs-wrap">
+  <div class="tab active" data-tab="panorama">01 · Panorama del Mercado</div>
+  <div class="tab" data-tab="rentabilidad">02 · Rentabilidad</div>
+  <div class="tab" data-tab="volatilidad">03 · Volatilidad &amp; Demanda</div>
+  <div class="tab" data-tab="oportunidades">04 · Oportunidades</div>
+</div>
+
+<main>
+
+<!-- PAGE 1 -->
+<section class="page active" id="page-panorama">
+  <div class="section-title">PANORAMA DEL MERCADO</div>
+  <div class="section-sub">Resumen general · 2.000 modelos · StockX 2023</div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card accent">
+      <div class="kpi-label">Modelos analizados</div>
+      <div class="kpi-value">2,000</div>
+      <div class="kpi-sub">23 marcas distintas</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Precio Retail Prom.</div>
+      <div class="kpi-value">$142</div>
+      <div class="kpi-sub">USD · precio de lanzamiento</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Precio Reventa Prom.</div>
+      <div class="kpi-value">$191</div>
+      <div class="kpi-sub">USD · último precio (lastSale)</div>
+    </div>
+    <div class="kpi-card positive">
+      <div class="kpi-label">Margen Mediano</div>
+      <div class="kpi-value">+19.8%</div>
+      <div class="kpi-sub">pricePremium sobre retail</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ventas Totales</div>
+      <div class="kpi-value">114K</div>
+      <div class="kpi-sub">114,459 transacciones</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Volatilidad Prom.</div>
+      <div class="kpi-value">13.2%</div>
+      <div class="kpi-sub">variación de precio</div>
+    </div>
+  </div>
+
+  <div class="chart-grid col-3">
+    <div class="chart-card">
+      <div class="chart-title">Volumen de ventas promedio por marca</div>
+      <canvas id="chartBrandSales" height="260"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Distribución de modelos por marca</div>
+      <canvas id="chartBrandShare" height="260"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-grid col-2">
+    <div class="chart-card">
+      <div class="chart-title">Precio retail vs. precio de reventa por marca</div>
+      <canvas id="chartRetailVsResale" height="220"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Precio promedio deadstock por marca</div>
+      <canvas id="chartDeadstock" height="220"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE 2 -->
+<section class="page" id="page-rentabilidad">
+  <div class="section-title">RENTABILIDAD POR MARCA</div>
+  <div class="section-sub">pricePremium mediano · top modelos · comparativa</div>
+
+  <div class="chart-grid col-2">
+    <div class="chart-card">
+      <div class="chart-title">pricePremium mediano por marca (%)</div>
+      <canvas id="chartPremiumBrand" height="260"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Ventas promedio vs. rentabilidad por marca</div>
+      <canvas id="chartSalesPremium" height="260"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:16px;">
+    <div class="chart-title">Top 10 modelos más rentables — pricePremium (%)</div>
+    <div style="overflow-x:auto;">
+      <table class="data-table" id="top10Table"></table>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE 3 -->
+<section class="page" id="page-volatilidad">
+  <div class="section-title">VOLATILIDAD &amp; DEMANDA</div>
+  <div class="section-sub">Relaciones entre ventas, riesgo, ganancia y presión de mercado</div>
+
+  <div class="filter-row">
+    <span class="filter-label">Filtrar por marca:</span>
+    <button class="filter-btn active" data-brand="all">Todas</button>
+    <button class="filter-btn" data-brand="Nike">Nike</button>
+    <button class="filter-btn" data-brand="Jordan">Jordan</button>
+    <button class="filter-btn" data-brand="adidas">Adidas</button>
+    <button class="filter-btn" data-brand="New Balance">New Balance</button>
+    <button class="filter-btn" data-brand="Crocs">Crocs</button>
+    <button class="filter-btn" data-brand="Puma">Puma</button>
+  </div>
+
+  <div class="chart-grid col-2">
+    <div class="chart-card">
+      <div class="chart-title">Ventas vs. margen de ganancia · <span style="color:var(--accent)">hover para detalles</span></div>
+      <canvas id="chartScatterSales" height="280"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Volatilidad vs. margen de ganancia</div>
+      <canvas id="chartScatterVol" height="280"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-grid col-2">
+    <div class="chart-card">
+      <div class="chart-title">Volatilidad promedio por marca (%)</div>
+      <canvas id="chartVolBrand" height="200"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Oferta vs. Demanda por marca · Compradores vs. Vendedores</div>
+      <div class="demand-legend">
+        <div class="demand-legend-item">
+          <div class="demand-legend-dot" style="background:linear-gradient(90deg,var(--accent),var(--accent3))"></div>
+          Compradores (numberOfBids)
+        </div>
+        <div class="demand-legend-item">
+          <div class="demand-legend-dot" style="background:#94a3b8"></div>
+          Vendedores (numberOfAsks)
+        </div>
+      </div>
+      <div id="demandBars"></div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Correlaciones clave del mercado</div>
+    <div id="corrItems" style="padding: 4px 0;"></div>
+  </div>
+</section>
+
+<!-- PAGE 4 -->
+<section class="page" id="page-oportunidades">
+  <div class="section-title">OPORTUNIDADES Y HALLAZGOS</div>
+  <div class="section-sub">Clasificación estratégica · líderes vs emergentes · conclusiones</div>
+
+  <div class="insight-row">
+    <div class="insight-card">
+      <div class="ic-num">34%</div>
+      <div class="ic-label">Ganancia promedio</div>
+      <div class="ic-body">El mercado de reventa genera en promedio un 34% sobre el precio de lanzamiento, con mediana de 19.8%.</div>
+    </div>
+    <div class="insight-card">
+      <div class="ic-num" style="color:var(--negative)">1,665%</div>
+      <div class="ic-label">Mayor margen registrado</div>
+      <div class="ic-body">Jordan 1 Retro Low OG SP Travis Scott: de $130 retail a $2,295. Colaboraciones artísticas = máxima rentabilidad.</div>
+    </div>
+    <div class="insight-card">
+      <div class="ic-num" style="color:var(--positive)">0.036</div>
+      <div class="ic-label">Correlación ventas-margen</div>
+      <div class="ic-body">El volumen de ventas NO garantiza mayor margen. La exclusividad es el principal determinante de rentabilidad.</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <div class="chart-card">
+      <div class="chart-title">Clasificación de productos por rentabilidad y volatilidad</div>
+      <canvas id="chartQuadrant" height="320"></canvas>
+      <div class="quadrant-legend">
+        <div class="ql-item">
+          <div class="ql-dot" style="background:#16a34a"></div>
+          <div>
+            <div class="ql-title" style="color:#16a34a">⭐ Estrella</div>
+            <div class="ql-desc">Alta rentabilidad + baja volatilidad. Mejor opción de inversión.</div>
+          </div>
+        </div>
+        <div class="ql-item">
+          <div class="ql-dot" style="background:#f97316"></div>
+          <div>
+            <div class="ql-title" style="color:#f97316">🔥 Especulativo</div>
+            <div class="ql-desc">Alta rentabilidad + alta volatilidad. Riesgo elevado, retorno potencial alto.</div>
+          </div>
+        </div>
+        <div class="ql-item">
+          <div class="ql-dot" style="background:#2563eb"></div>
+          <div>
+            <div class="ql-title" style="color:#2563eb">🛡️ Estable</div>
+            <div class="ql-desc">Baja rentabilidad + baja volatilidad. Seguro pero limitado.</div>
+          </div>
+        </div>
+        <div class="ql-item">
+          <div class="ql-dot" style="background:#dc2626"></div>
+          <div>
+            <div class="ql-title" style="color:#dc2626">⚠️ Riesgoso</div>
+            <div class="ql-desc">Baja rentabilidad + alta volatilidad. Evitar para inversión.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="comp-grid">
+    <div class="comp-card leader">
+      <div class="comp-header">
+        Marcas Líderes <span class="type-badge">Nike · Jordan · Adidas</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">pricePremium mediano</span>
+        <span class="stat-val" style="color:var(--accent)">19.55%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">Ventas promedio</span>
+        <span class="stat-val">59.8</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">Volatilidad promedio</span>
+        <span class="stat-val">13.13%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">Modelos en dataset</span>
+        <span class="stat-val">1,777</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">Ventaja</span>
+        <span style="font-family:var(--font-ui);font-size:11px;color:var(--positive);font-weight:700;">Mayor liquidez y volumen</span>
+      </div>
+    </div>
+    <div class="comp-card emergent">
+      <div class="comp-header">
+        Marcas Emergentes <span class="type-badge">Crocs · Puma · NB · otros</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">pricePremium mediano</span>
+        <span class="stat-val" style="color:var(--accent2)">20.00%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">Ventas promedio</span>
+        <span class="stat-val">37.1</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">Volatilidad promedio</span>
+        <span class="stat-val">14.21%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">Modelos en dataset</span>
+        <span class="stat-val">223</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">Ventaja</span>
+        <span style="font-family:var(--font-ui);font-size:11px;color:var(--accent2);font-weight:700;">Mayor margen relativo (nicho)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ── DATA (real CSV) ──────────────────────────────────────────────────────────
+const brands = [
+  { brand:"Nike",        count:863, avg_bids:188.0, avg_asks:440.6, median_premium:16.7, avg_sales:57.2, avg_vol:13.8, avg_retail:129, avg_resale:165, avg_deadstock:177 },
+  { brand:"Jordan",      count:676, avg_bids:235.1, avg_asks:671.4, median_premium:19.0, avg_sales:55.4, avg_vol:12.2, avg_retail:153, avg_resale:220, avg_deadstock:229 },
+  { brand:"adidas",      count:231, avg_bids:210.2, avg_asks:695.7, median_premium:30.7, avg_sales:83.0, avg_vol:13.3, avg_retail:166, avg_resale:218, avg_deadstock:223 },
+  { brand:"New Balance", count:134, avg_bids:155.8, avg_asks:302.0, median_premium:22.7, avg_sales:39.2, avg_vol:14.4, avg_retail:139, avg_resale:182, avg_deadstock:196 },
+  { brand:"Crocs",       count:18,  avg_bids:111.4, avg_asks:377.3, median_premium:53.3, avg_sales:55.1, avg_vol:14.7, avg_retail:73,  avg_resale:118, avg_deadstock:125 },
+  { brand:"Converse",    count:18,  avg_bids:85.2,  avg_asks:265.9, median_premium:6.7,  avg_sales:24.7, avg_vol:13.0, avg_retail:118, avg_resale:140, avg_deadstock:154 },
+  { brand:"Puma",        count:14,  avg_bids:103.6, avg_asks:271.2, median_premium:56.7, avg_sales:41.5, avg_vol:14.6, avg_retail:120, avg_resale:181, avg_deadstock:161 },
+  { brand:"UGG",         count:11,  avg_bids:32.8,  avg_asks:160.0, median_premium:3.3,  avg_sales:28.3, avg_vol:13.5, avg_retail:110, avg_resale:120, avg_deadstock:146 },
+];
+
+const top10 = [
+  { rank:1,  item:"Jordan 1 Retro Low OG SP Travis Scott",           brand:"Jordan", retail:130, lastSale:2295, pct:1665.4, vol:7.4,  bids:315, asks:236 },
+  { rank:2,  item:"Jordan 1 Retro Low OG SP Travis Scott",           brand:"Jordan", retail:130, lastSale:1899, pct:1360.8, vol:9.0,  bids:315, asks:238 },
+  { rank:3,  item:"Jordan 1 Retro High Off-White University Blue",   brand:"Jordan", retail:190, lastSale:2200, pct:1057.9, vol:13.6, bids:304, asks:375 },
+  { rank:4,  item:"Jordan 1 Low Fragment x Travis Scott",            brand:"Jordan", retail:150, lastSale:1569, pct:946.0,  vol:5.0,  bids:606, asks:663 },
+  { rank:5,  item:"Jordan 1 Retro Low OG SP Fragment x Travis Scott",brand:"Jordan", retail:150, lastSale:1406, pct:837.3,  vol:17.7, bids:645, asks:553 },
+  { rank:6,  item:"Jordan 1 Retro High Travis Scott",                brand:"Jordan", retail:175, lastSale:1583, pct:804.6,  vol:9.3,  bids:384, asks:539 },
+  { rank:7,  item:"Jordan 4 Retro Off-White Sail (W)",               brand:"Jordan", retail:200, lastSale:1608, pct:703.6,  vol:45.5, bids:327, asks:408 },
+  { rank:8,  item:"Nike Air Max 1 Travis Scott Cactus Jack Wheat",   brand:"Nike",   retail:160, lastSale:1100, pct:587.5,  vol:15.7, bids:280, asks:117 },
+  { rank:9,  item:"Jordan 4 Retro Off-White Sail (W)",               brand:"Jordan", retail:200, lastSale:1349, pct:574.5,  vol:22.3, bids:335, asks:450 },
+  { rank:10, item:"Jordan 1 Retro Low OG SP Travis Scott Reverse",   brand:"Jordan", retail:150, lastSale:920,  pct:513.3,  vol:17.7, bids:754, asks:704 },
+];
+
+const scatter = [{"item":"Nike Dunk High Blue Chill","brand":"Nike","salesThisPeriod":101,"pricePremium_pct":13.9,"volatility_pct":10.8},{"item":"Jordan 1 High Zoom Air CMFT Pink Oxford (W)","brand":"Jordan","salesThisPeriod":18,"pricePremium_pct":7.9,"volatility_pct":10.6},{"item":"Nike Dunk Low Next Nature Sail (W)","brand":"Nike","salesThisPeriod":19,"pricePremium_pct":51.0,"volatility_pct":9.5},{"item":"Nike SB Dunk Low Pro Be True","brand":"Nike","salesThisPeriod":45,"pricePremium_pct":52.2,"volatility_pct":14.2},{"item":"Nike PG 6 What The","brand":"Nike","salesThisPeriod":41,"pricePremium_pct":3.6,"volatility_pct":0.0},{"item":"Nike SB Dunk Low Pro Parra Abstract Art (2021)","brand":"Nike","salesThisPeriod":15,"pricePremium_pct":218.2,"volatility_pct":17.6},{"item":"Nike Dunk Low SE Easter Candy (W)","brand":"Nike","salesThisPeriod":38,"pricePremium_pct":66.4,"volatility_pct":29.2},{"item":"Puma LaMelo Ball MB.01 Lo Green Gecko","brand":"Puma","salesThisPeriod":17,"pricePremium_pct":32.1,"volatility_pct":9.5},{"item":"Jordan 13 Retro Flint (2020)","brand":"Jordan","salesThisPeriod":12,"pricePremium_pct":61.6,"volatility_pct":9.4},{"item":"Jordan 1 Low Ashen Slate","brand":"Jordan","salesThisPeriod":42,"pricePremium_pct":58.2,"volatility_pct":11.0},{"item":"Jordan 1 Mid SE Pastel Vivid Green Grind (GS)","brand":"Jordan","salesThisPeriod":36,"pricePremium_pct":-15.5,"volatility_pct":9.2},{"item":"Jordan 1 Retro High Pollen","brand":"Jordan","salesThisPeriod":60,"pricePremium_pct":0.0,"volatility_pct":11.3},{"item":"adidas Yeezy Boost 350 V2 Cream/Triple White","brand":"adidas","salesThisPeriod":33,"pricePremium_pct":36.8,"volatility_pct":55.6},{"item":"Nike Air Force 1 Low SP AMBUSH Phantom","brand":"Nike","salesThisPeriod":186,"pricePremium_pct":32.1,"volatility_pct":11.8},{"item":"Nike Dunk Low Team Red (2022)","brand":"Nike","salesThisPeriod":24,"pricePremium_pct":53.0,"volatility_pct":12.0},{"item":"Jordan 1 Low Mocha","brand":"Jordan","salesThisPeriod":110,"pricePremium_pct":97.0,"volatility_pct":8.6},{"item":"UGG Disquette Slipper Chestnut (Women's)","brand":"UGG","salesThisPeriod":18,"pricePremium_pct":-1.0,"volatility_pct":13.9},{"item":"New Balance 990v2 MiUSA Teddy Santis Sea Salt","brand":"New Balance","salesThisPeriod":38,"pricePremium_pct":21.0,"volatility_pct":16.1},{"item":"adidas Samba Classic Black White Dark Gum","brand":"adidas","salesThisPeriod":15,"pricePremium_pct":18.2,"volatility_pct":11.9},{"item":"New Balance 550 White Black","brand":"New Balance","salesThisPeriod":96,"pricePremium_pct":-12.7,"volatility_pct":12.0},{"item":"Nike Air Max 90 Metallic Silver (2020) (W)","brand":"Nike","salesThisPeriod":15,"pricePremium_pct":-29.4,"volatility_pct":23.1},{"item":"Nike Blazer Low sacai White Patent Leather","brand":"Nike","salesThisPeriod":15,"pricePremium_pct":-20.8,"volatility_pct":15.8},{"item":"Jordan 1 Retro High Electro Orange","brand":"Jordan","salesThisPeriod":20,"pricePremium_pct":-1.2,"volatility_pct":15.1},{"item":"Jordan 1 Retro Low OG SP Travis Scott Black Phantom","brand":"Jordan","salesThisPeriod":110,"pricePremium_pct":374.9,"volatility_pct":8.0},{"item":"Jordan 9 Retro Chile Red","brand":"Jordan","salesThisPeriod":14,"pricePremium_pct":17.5,"volatility_pct":4.5},{"item":"Jordan 4 Retro Bred (2019)","brand":"Jordan","salesThisPeriod":19,"pricePremium_pct":219.3,"volatility_pct":11.0},{"item":"Jordan 1 Low Shadow Toe (GS)","brand":"Jordan","salesThisPeriod":176,"pricePremium_pct":43.3,"volatility_pct":6.6},{"item":"Nike Dunk Low Tartan Plaid","brand":"Nike","salesThisPeriod":28,"pricePremium_pct":-37.5,"volatility_pct":0.0},{"item":"Nike Air Max Goadome 865031 Black","brand":"Nike","salesThisPeriod":19,"pricePremium_pct":-40.6,"volatility_pct":11.8},{"item":"Jordan 11 Retro Playoffs Bred (2019)","brand":"Jordan","salesThisPeriod":29,"pricePremium_pct":45.0,"volatility_pct":14.3},{"item":"Nike Air Max 1 Kasina Won-Ang Orange","brand":"Nike","salesThisPeriod":276,"pricePremium_pct":21.9,"volatility_pct":6.6},{"item":"Nike Air Max 90 Infrared (2020)","brand":"Nike","salesThisPeriod":12,"pricePremium_pct":61.9,"volatility_pct":15.0},{"item":"Jordan 1 Mid Banned (2020)","brand":"Jordan","salesThisPeriod":16,"pricePremium_pct":34.8,"volatility_pct":6.3},{"item":"Nike Dunk Low Safari Mix (W)","brand":"Nike","salesThisPeriod":308,"pricePremium_pct":4.2,"volatility_pct":5.0},{"item":"Nike Air Max 95 Triple Black (2020)","brand":"Nike","salesThisPeriod":29,"pricePremium_pct":-29.4,"volatility_pct":8.8},{"item":"Jordan 3 Retro Cool Grey (2021)","brand":"Jordan","salesThisPeriod":12,"pricePremium_pct":56.3,"volatility_pct":7.7},{"item":"Puma LaMelo Ball MB.02 Nickelodeon Slime","brand":"Puma","salesThisPeriod":34,"pricePremium_pct":10.7,"volatility_pct":20.2},{"item":"Jordan 1 Retro High OG Chicago Lost and Found (GS)","brand":"Jordan","salesThisPeriod":56,"pricePremium_pct":50.7,"volatility_pct":6.9},{"item":"Jordan 4 Retro Infrared (GS)","brand":"Jordan","salesThisPeriod":45,"pricePremium_pct":13.1,"volatility_pct":2.7},{"item":"adidas Ultra Boost 1.0 Cream Chalk (2018/2022)","brand":"adidas","salesThisPeriod":16,"pricePremium_pct":-29.5,"volatility_pct":8.4},{"item":"Jordan 1 Retro High Dark Mocha","brand":"Jordan","salesThisPeriod":56,"pricePremium_pct":152.4,"volatility_pct":14.2},{"item":"Jordan 1 Low Cardinal Red","brand":"Jordan","salesThisPeriod":15,"pricePremium_pct":30.0,"volatility_pct":12.9},{"item":"Jordan 5 Retro Easter (2022) (GS)","brand":"Jordan","salesThisPeriod":39,"pricePremium_pct":-8.0,"volatility_pct":15.4},{"item":"Nike Dunk Low Retro Black Hyper Cobalt (2021)","brand":"Nike","salesThisPeriod":15,"pricePremium_pct":143.0,"volatility_pct":13.3},{"item":"Nike Dunk Low Golden Gals Metallic Silver (W)","brand":"Nike","salesThisPeriod":31,"pricePremium_pct":80.0,"volatility_pct":7.0},{"item":"Jordan 2 Retro Low UNC To Chicago (Women's)","brand":"Jordan","salesThisPeriod":17,"pricePremium_pct":-20.7,"volatility_pct":20.0},{"item":"New Balance 550 UNC White University Blue","brand":"New Balance","salesThisPeriod":40,"pricePremium_pct":160.9,"volatility_pct":11.3},{"item":"Nike Air Force 1 Low SP AMBUSH Black","brand":"Nike","salesThisPeriod":234,"pricePremium_pct":22.6,"volatility_pct":9.6},{"item":"Jordan 1 Low SE Concord (GS)","brand":"Jordan","salesThisPeriod":80,"pricePremium_pct":10.5,"volatility_pct":13.7},{"item":"Air Jordan 1 Mid Taxi","brand":"Jordan","salesThisPeriod":15,"pricePremium_pct":28.1,"volatility_pct":12.8},{"item":"adidas Yeezy Boost 350 V2 Onyx","brand":"adidas","salesThisPeriod":26,"pricePremium_pct":45.7,"volatility_pct":6.1},{"item":"New Balance 2002R Protection Pack Vintage Orange","brand":"New Balance","salesThisPeriod":17,"pricePremium_pct":59.3,"volatility_pct":13.9},{"item":"Nike Dunk Low Avocado (W)","brand":"Nike","salesThisPeriod":13,"pricePremium_pct":3.3,"volatility_pct":8.7},{"item":"Jordan Legacy 312 Low Chicago Red","brand":"Jordan","salesThisPeriod":17,"pricePremium_pct":0.8,"volatility_pct":15.7},{"item":"Nike KD 15 Refuge","brand":"Nike","salesThisPeriod":23,"pricePremium_pct":-12.0,"volatility_pct":17.4},{"item":"Nike Blazer Mid 77 White Black (W)","brand":"Nike","salesThisPeriod":107,"pricePremium_pct":-40.0,"volatility_pct":11.2},{"item":"adidas Yeezy Boost 350 V2 Bone","brand":"adidas","salesThisPeriod":375,"pricePremium_pct":35.7,"volatility_pct":8.0},{"item":"Nike Dunk Low Free 99 Black","brand":"Nike","salesThisPeriod":12,"pricePremium_pct":62.7,"volatility_pct":13.9},{"item":"Jordan 2 Retro J Balvin","brand":"Jordan","salesThisPeriod":18,"pricePremium_pct":-21.6,"volatility_pct":9.9},{"item":"Jordan 11 Retro Low 72-10 (TD)","brand":"Jordan","salesThisPeriod":16,"pricePremium_pct":10.0,"volatility_pct":8.4},{"item":"Jordan 1 High Element Gore-Tex Light Bone","brand":"Jordan","salesThisPeriod":21,"pricePremium_pct":-5.0,"volatility_pct":0.0},{"item":"Jordan Zion 1 SP Naruto Kyuubi","brand":"Jordan","salesThisPeriod":19,"pricePremium_pct":16.2,"volatility_pct":10.8},{"item":"Jordan 1 Mid Wolf Grey Aluminum (Women's)","brand":"Jordan","salesThisPeriod":16,"pricePremium_pct":126.1,"volatility_pct":14.9},{"item":"New Balance 2002R Protection Pack Distressed","brand":"New Balance","salesThisPeriod":12,"pricePremium_pct":37.3,"volatility_pct":16.6},{"item":"Nike SB Dunk Low Pro QS Neckface","brand":"Nike","salesThisPeriod":58,"pricePremium_pct":106.0,"volatility_pct":16.6},{"item":"Nike Dunk High Aluminum (W)","brand":"Nike","salesThisPeriod":17,"pricePremium_pct":111.8,"volatility_pct":10.5},{"item":"Jordan 3 Retro Cardinal (GS)","brand":"Jordan","salesThisPeriod":15,"pricePremium_pct":10.7,"volatility_pct":5.9},{"item":"New Balance 9060 Joe Freshgoods Penny Cookie Pink","brand":"New Balance","salesThisPeriod":53,"pricePremium_pct":63.9,"volatility_pct":6.3},{"item":"Nike LeBron 18 Low Wile E. vs Roadrunner","brand":"Nike","salesThisPeriod":25,"pricePremium_pct":-9.4,"volatility_pct":18.3},{"item":"Jordan 1 Retro High OG Stage Haze","brand":"Jordan","salesThisPeriod":463,"pricePremium_pct":27.6,"volatility_pct":6.1},{"item":"Jordan 11 Retro Midnight Navy (Women's)","brand":"Jordan","salesThisPeriod":27,"pricePremium_pct":-1.3,"volatility_pct":8.8},{"item":"Puma LaMelo Ball MB.01 Buzz City","brand":"Puma","salesThisPeriod":14,"pricePremium_pct":60.0,"volatility_pct":17.4},{"item":"Nike Dunk High Panda (2021) (Women's)","brand":"Nike","salesThisPeriod":131,"pricePremium_pct":12.7,"volatility_pct":8.3},{"item":"Nike Dunk Low QS LeBron James Fruity Pebbles","brand":"Nike","salesThisPeriod":126,"pricePremium_pct":26.9,"volatility_pct":10.2},{"item":"adidas Yeezy Boost 350 V2 Blue Tint","brand":"adidas","salesThisPeriod":170,"pricePremium_pct":41.8,"volatility_pct":9.2},{"item":"Jordan 1 Retro High OG Starfish (Women's)","brand":"Jordan","salesThisPeriod":75,"pricePremium_pct":-0.6,"volatility_pct":8.9},{"item":"New Balance 550 White Burgundy","brand":"New Balance","salesThisPeriod":16,"pricePremium_pct":84.0,"volatility_pct":16.9},{"item":"Nike Dunk High Ambush Active Fuchsia","brand":"Nike","salesThisPeriod":13,"pricePremium_pct":25.0,"volatility_pct":18.4},{"item":"Jordan 12 Retro Playoffs (2022) (GS)","brand":"Jordan","salesThisPeriod":28,"pricePremium_pct":-6.0,"volatility_pct":7.4},{"item":"Jordan 1 Low Lemonade (W)","brand":"Jordan","salesThisPeriod":36,"pricePremium_pct":29.0,"volatility_pct":9.5},{"item":"Jordan 1 Retro High 85 Black White (2023)","brand":"Jordan","salesThisPeriod":127,"pricePremium_pct":30.0,"volatility_pct":11.0},{"item":"New Balance 992 Grey","brand":"New Balance","salesThisPeriod":13,"pricePremium_pct":80.0,"volatility_pct":12.0},{"item":"Jordan 11 Retro Cool Grey (2021)","brand":"Jordan","salesThisPeriod":121,"pricePremium_pct":26.2,"volatility_pct":21.4},{"item":"UGG Tasman Slipper Chestnut (Women's)","brand":"UGG","salesThisPeriod":55,"pricePremium_pct":29.0,"volatility_pct":10.1},{"item":"Nike Dunk Low Setsubun (2022)","brand":"Nike","salesThisPeriod":14,"pricePremium_pct":221.8,"volatility_pct":9.3},{"item":"Jordan 6 Retro Travis Scott British Khaki","brand":"Jordan","salesThisPeriod":27,"pricePremium_pct":87.2,"volatility_pct":9.8},{"item":"Jordan 6 Retro Red Oreo","brand":"Jordan","salesThisPeriod":295,"pricePremium_pct":0.5,"volatility_pct":5.9},{"item":"Nike Air Max 1 Crepe Soft Grey","brand":"Nike","salesThisPeriod":53,"pricePremium_pct":3.1,"volatility_pct":10.9},{"item":"Jordan 1 Retro High Dark Mocha","brand":"Jordan","salesThisPeriod":56,"pricePremium_pct":152.4,"volatility_pct":14.2},{"item":"Nike SB Dunk Low Concepts Orange Lobster","brand":"Nike","salesThisPeriod":77,"pricePremium_pct":352.5,"volatility_pct":22.0},{"item":"adidas Yeezy Slide Pure (First Release)","brand":"adidas","salesThisPeriod":30,"pricePremium_pct":347.3,"volatility_pct":8.4},{"item":"Jordan 4 Retro Infrared","brand":"Jordan","salesThisPeriod":345,"pricePremium_pct":30.0,"volatility_pct":3.3},{"item":"adidas Yeezy Foam RNR Onyx (Kids)","brand":"adidas","salesThisPeriod":143,"pricePremium_pct":103.3,"volatility_pct":3.3},{"item":"Jordan 1 Retro High OG Chicago Lost and Found","brand":"Jordan","salesThisPeriod":196,"pricePremium_pct":159.3,"volatility_pct":6.6},{"item":"Nike Dunk Low 3D Swoosh","brand":"Nike","salesThisPeriod":189,"pricePremium_pct":49.0,"volatility_pct":6.8},{"item":"Jordan 4 Retro Midnight Navy","brand":"Jordan","salesThisPeriod":189,"pricePremium_pct":31.0,"volatility_pct":6.5},{"item":"Nike Dunk Low Dark Marina Blue","brand":"Nike","salesThisPeriod":172,"pricePremium_pct":43.0,"volatility_pct":8.6}];
+
+// ── COLORS ───────────────────────────────────────────────────────────────────
+const BRAND_COLORS = {
+  Nike:          '#f97316',
+  Jordan:        '#dc2626',
+  adidas:        '#2563eb',
+  'New Balance': '#16a34a',
+  Crocs:         '#ca8a04',
+  Puma:          '#7c3aed',
+  Converse:      '#0891b2',
+  UGG:           '#be185d',
+  Other:         '#9a7c5f',
+};
+function brandColor(b){ return BRAND_COLORS[b] || '#9a7c5f'; }
+function brandPill(b){
+  const m = { Nike:'nike', Jordan:'jordan', adidas:'adidas', 'New Balance':'nb', Crocs:'crocs', Puma:'puma', Converse:'converse', UGG:'other' };
+  return m[b] || 'other';
+}
+
+// ── CHART CONFIG ─────────────────────────────────────────────────────────────
+const CFG = {
+  plugins:{ legend:{ display:false }, tooltip:{ enabled:false } },
+  scales:{
+    x:{ grid:{ color:'rgba(240,228,212,.6)' }, ticks:{ color:'#9a7c5f', font:{ family:'Barlow Condensed', size:11, weight:'600' } } },
+    y:{ grid:{ color:'rgba(240,228,212,.6)' }, ticks:{ color:'#9a7c5f', font:{ family:'Barlow Condensed', size:11, weight:'600' } } }
+  }
+};
+const TT = { backgroundColor:'#ffffff', borderColor:'#f0e4d4', borderWidth:1, titleColor:'#1c1109', bodyColor:'#9a7c5f', titleFont:{family:'Barlow Condensed',weight:'700'} };
+
+// ── CHART 1: Brand Sales ─────────────────────────────────────────────────────
+new Chart(document.getElementById('chartBrandSales'), {
+  type:'bar',
+  data:{
+    labels: brands.sort((a,b)=>b.avg_sales-a.avg_sales).map(b=>b.brand),
+    datasets:[{ data: brands.sort((a,b)=>b.avg_sales-a.avg_sales).map(b=>b.avg_sales),
+      backgroundColor: brands.sort((a,b)=>b.avg_sales-a.avg_sales).map(b=>brandColor(b.brand)+'cc'),
+      borderColor: brands.sort((a,b)=>b.avg_sales-a.avg_sales).map(b=>brandColor(b.brand)),
+      borderWidth:1, borderRadius:8 }]
+  },
+  options:{...CFG, plugins:{...CFG.plugins, tooltip:{enabled:true,...TT, callbacks:{ label: ctx=>` ${ctx.raw.toFixed(1)} ventas promedio`} } }}
+});
+
+// ── CHART 2: Donut brand share ───────────────────────────────────────────────
+new Chart(document.getElementById('chartBrandShare'), {
+  type:'doughnut',
+  data:{
+    labels: brands.map(b=>b.brand),
+    datasets:[{ data: brands.map(b=>b.count),
+      backgroundColor: brands.map(b=>brandColor(b.brand)+'cc'),
+      borderColor: '#ffffff', borderWidth:3 }]
+  },
+  options:{ plugins:{ legend:{ display:true, position:'right', labels:{ color:'#9a7c5f', font:{family:'Barlow Condensed',size:10,weight:'600'}, boxWidth:10, padding:8 } },
+    tooltip:{enabled:true,...TT, callbacks:{ label: ctx=>`${ctx.label}: ${ctx.raw} modelos` }} } }
+});
+
+// ── CHART 3: Retail vs Resale ────────────────────────────────────────────────
+const brandsSort = [...brands].sort((a,b)=>b.avg_resale-a.avg_resale);
+new Chart(document.getElementById('chartRetailVsResale'), {
+  type:'bar',
+  data:{
+    labels: brandsSort.map(b=>b.brand),
+    datasets:[
+      { label:'Retail', data: brandsSort.map(b=>b.avg_retail), backgroundColor:'rgba(154,124,95,.2)', borderColor:'rgba(154,124,95,.5)', borderWidth:1, borderRadius:6 },
+      { label:'Reventa', data: brandsSort.map(b=>b.avg_resale), backgroundColor: brandsSort.map(b=>brandColor(b.brand)+'99'), borderColor: brandsSort.map(b=>brandColor(b.brand)), borderWidth:1, borderRadius:6 }
+    ]
+  },
+  options:{...CFG, plugins:{...CFG.plugins, legend:{display:true, labels:{color:'#9a7c5f', font:{family:'Barlow Condensed',size:10,weight:'600'}, boxWidth:10}},
+    tooltip:{enabled:true,...TT, callbacks:{ label: ctx=>`${ctx.dataset.label}: $${ctx.raw} USD`} } } }
+});
+
+// ── CHART 4: Deadstock ───────────────────────────────────────────────────────
+const avgDeadstock = [...brands].sort((a,b)=>b.avg_deadstock-a.avg_deadstock);
+new Chart(document.getElementById('chartDeadstock'), {
+  type:'bar',
+  data:{ labels: avgDeadstock.map(b=>b.brand),
+    datasets:[{ data: avgDeadstock.map(b=>b.avg_deadstock),
+      backgroundColor: avgDeadstock.map(b=>brandColor(b.brand)+'99'),
+      borderColor: avgDeadstock.map(b=>brandColor(b.brand)),
+      borderWidth:1, borderRadius:8 }]},
+  options:{...CFG, plugins:{...CFG.plugins, tooltip:{enabled:true,...TT, callbacks:{ label: ctx=>`$${ctx.raw} USD promedio`} } }}
+});
+
+// ── CHART 5: Premium by brand ────────────────────────────────────────────────
+const brandsByPremium = [...brands].sort((a,b)=>b.median_premium-a.median_premium);
+new Chart(document.getElementById('chartPremiumBrand'), {
+  type:'bar',
+  data:{ labels: brandsByPremium.map(b=>b.brand),
+    datasets:[{ data: brandsByPremium.map(b=>b.median_premium),
+      backgroundColor: brandsByPremium.map(b=>brandColor(b.brand)+'cc'),
+      borderColor: brandsByPremium.map(b=>brandColor(b.brand)),
+      borderWidth:1, borderRadius:8 }]},
+  options:{...CFG, plugins:{...CFG.plugins, tooltip:{enabled:true,...TT, callbacks:{ label: ctx=>`+${ctx.raw}% margen mediano`} } },
+    scales:{...CFG.scales, y:{...CFG.scales.y, ticks:{...CFG.scales.y.ticks, callback: v=>v+'%'} }} }
+});
+
+// ── CHART 6: Sales vs Premium bubble ────────────────────────────────────────
+new Chart(document.getElementById('chartSalesPremium'), {
+  type:'scatter',
+  data:{ datasets: brands.map(b=>({
+    label: b.brand,
+    data:[{ x: b.avg_sales, y: b.median_premium }],
+    backgroundColor: brandColor(b.brand)+'bb',
+    borderColor: brandColor(b.brand),
+    borderWidth:1,
+    pointRadius: Math.sqrt(b.count)*1.5 + 6,
+    pointHoverRadius: Math.sqrt(b.count)*1.5 + 9,
+  })) },
+  options:{ plugins:{
+    legend:{ display:true, labels:{ color:'#9a7c5f', font:{family:'Barlow Condensed',size:10,weight:'600'}, boxWidth:8, padding:8 } },
+    tooltip:{...TT, enabled:true, callbacks:{ title: ctx=>ctx[0].dataset.label, label: ctx=>[` Ventas prom: ${ctx.raw.x.toFixed(1)}`, ` Margen: +${ctx.raw.y}%`] } }
+  }, scales:{
+    x:{ ...CFG.scales.x, title:{ display:true, text:'Ventas promedio', color:'#9a7c5f', font:{family:'Barlow Condensed',size:10,weight:'600'} } },
+    y:{ ...CFG.scales.y, title:{ display:true, text:'pricePremium (%)', color:'#9a7c5f', font:{family:'Barlow Condensed',size:10,weight:'600'} },
+        ticks:{...CFG.scales.y.ticks, callback: v=>v+'%'} }
+  } }
+});
+
+// ── TOP 10 TABLE ─────────────────────────────────────────────────────────────
+const t = document.getElementById('top10Table');
+t.innerHTML = `<thead><tr>
+  <th>#</th><th>Modelo</th><th>Marca</th>
+  <th>Retail (USD)</th><th>Reventa (USD)</th><th>pricePremium</th><th>Volatilidad</th><th>Bids</th><th>Asks</th>
+</tr></thead>`;
+const tb = document.createElement('tbody');
+top10.forEach(r=>{
+  const barW = Math.min((r.pct/1700)*120, 120);
+  tb.innerHTML += `<tr>
+    <td><span class="rank-num ${r.rank<=3?'top3':''}">${String(r.rank).padStart(2,'0')}</span></td>
+    <td style="max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.item}</td>
+    <td><span class="pill ${brandPill(r.brand)}">${r.brand}</span></td>
+    <td>$${r.retail}</td>
+    <td style="color:var(--text);font-weight:600;">$${r.lastSale.toLocaleString()}</td>
+    <td><div class="premium-bar-wrap">
+      <div class="premium-bar" style="width:${barW}px;"></div>
+      <span class="premium-val">+${r.pct.toLocaleString()}%</span>
+    </div></td>
+    <td style="color:${r.vol>20?'var(--negative)':'var(--muted)'};">${r.vol}%</td>
+    <td style="color:var(--accent);font-weight:700;">${r.bids.toLocaleString()}</td>
+    <td style="color:var(--muted);">${r.asks.toLocaleString()}</td>
+  </tr>`;
+});
+t.appendChild(tb);
+
+// ── DEMAND BARS (numberOfBids vs numberOfAsks) ────────────────────────────────
+const demandContainer = document.getElementById('demandBars');
+const maxBids = Math.max(...brands.map(b=>b.avg_asks));
+brands.sort((a,b)=>b.avg_bids-a.avg_bids).forEach(b=>{
+  const bidsW = Math.round((b.avg_bids/maxBids)*220);
+  const asksW = Math.round((b.avg_asks/maxBids)*220);
+  demandContainer.innerHTML += `<div class="demand-bar-row">
+    <span class="demand-brand-label">${b.brand}</span>
+    <div class="demand-bars">
+      <div class="demand-bar-track">
+        <div class="demand-bar-fill bids" style="width:${bidsW}px;"></div>
+        <span class="demand-bar-val">${b.avg_bids.toFixed(0)} compradores</span>
+      </div>
+      <div class="demand-bar-track">
+        <div class="demand-bar-fill asks" style="width:${asksW}px;"></div>
+        <span class="demand-bar-val">${b.avg_asks.toFixed(0)} vendedores</span>
+      </div>
+    </div>
+  </div>`;
+});
+
+// ── CORRELACIONES ─────────────────────────────────────────────────────────────
+const corrData = [
+  { label:'Ventas → pricePremium', val:'0.036', desc:'Muy baja — el volumen no garantiza margen', pct:4,  color:'#9a7c5f' },
+  { label:'Volatilidad → pricePremium', val:'-0.038', desc:'Negativa leve — mayor volatilidad reduce rentabilidad', pct:4, color:'#dc2626' },
+  { label:'Ventas → Volatilidad', val:'-0.109', desc:'Negativa leve — más ventas = menor variación de precio', pct:11, color:'#2563eb' },
+];
+const corrContainer = document.getElementById('corrItems');
+corrData.forEach(c=>{
+  corrContainer.innerHTML += `<div class="corr-item">
+    <div class="corr-val">${c.val}</div>
+    <div class="corr-bar-track">
+      <div class="corr-bar-fill" style="width:${c.pct}%;background:${c.color};"></div>
+    </div>
+    <div>
+      <div class="corr-label" style="color:${c.color}">${c.label}</div>
+      <div class="corr-desc">${c.desc}</div>
+    </div>
+  </div>`;
+});
+
+// ── SCATTER CHARTS ────────────────────────────────────────────────────────────
+let activeFilter = 'all';
+let scatterChartSales, scatterChartVol;
+
+const SCATTER_BRANDS = ['Nike','Jordan','adidas','New Balance','Crocs','Puma'];
+
+function buildScatterDatasets(data){
+  const groups = {};
+  data.forEach(d=>{
+    const b = SCATTER_BRANDS.includes(d.brand) ? d.brand : 'Other';
+    if(!groups[b]) groups[b]=[];
+    groups[b].push(d);
+  });
+  return Object.entries(groups).map(([b,pts])=>({
+    label:b,
+    data: pts.map(p=>({ x:p.salesThisPeriod, y:p.pricePremium_pct, item:p.item, brand:p.brand, vol:p.volatility_pct })),
+    backgroundColor: brandColor(b)+'88', borderColor: brandColor(b), borderWidth:1, pointRadius:5, pointHoverRadius:8,
+  }));
+}
+function buildScatterVolDatasets(data){
+  const groups = {};
+  data.forEach(d=>{
+    const b = SCATTER_BRANDS.includes(d.brand) ? d.brand : 'Other';
+    if(!groups[b]) groups[b]=[];
+    groups[b].push(d);
+  });
+  return Object.entries(groups).map(([b,pts])=>({
+    label:b,
+    data: pts.map(p=>({ x:p.volatility_pct, y:p.pricePremium_pct, item:p.item, brand:p.brand })),
+    backgroundColor: brandColor(b)+'88', borderColor: brandColor(b), borderWidth:1, pointRadius:5, pointHoverRadius:8,
+  }));
+}
+function filteredData(brand){ return brand==='all' ? scatter : scatter.filter(d=>d.brand===brand); }
+
+const tooltipEl = document.getElementById('scatter-tooltip');
+function makeTooltipPlugin(labelFn){
+  return { id:'custom-tooltip', afterEvent(chart,args){
+    const e = args.event;
+    if(e.type!=='mousemove'){ tooltipEl.style.display='none'; return; }
+    const pts = chart.getElementsAtEventForMode(e.native,'nearest',{intersect:true},false);
+    if(!pts.length){ tooltipEl.style.display='none'; return; }
+    const pt = pts[0];
+    const raw = chart.data.datasets[pt.datasetIndex].data[pt.index];
+    tooltipEl.style.display = 'block';
+    tooltipEl.style.left = (e.native.clientX+12)+'px';
+    tooltipEl.style.top  = (e.native.clientY-10)+'px';
+    tooltipEl.innerHTML = labelFn(raw);
+  }};
+}
+
+scatterChartSales = new Chart(document.getElementById('chartScatterSales'), {
+  type:'scatter',
+  data:{ datasets: buildScatterDatasets(scatter) },
+  options:{ plugins:{ legend:{ display:true, labels:{ color:'#9a7c5f', font:{family:'Barlow Condensed',size:10,weight:'600'}, boxWidth:8, padding:8 } }, tooltip:{enabled:false}, 'custom-tooltip':{} },
+    scales:{ x:{...CFG.scales.x, title:{display:true,text:'Ventas (salesThisPeriod)',color:'#9a7c5f',font:{family:'Barlow Condensed',size:10,weight:'600'}}},
+             y:{...CFG.scales.y, title:{display:true,text:'pricePremium (%)',color:'#9a7c5f',font:{family:'Barlow Condensed',size:10,weight:'600'}}, ticks:{...CFG.scales.y.ticks, callback:v=>v+'%'}} } },
+  plugins:[makeTooltipPlugin(r=>`<strong>${r.item}</strong><span>Marca:</span> ${r.brand}<br><span>Ventas:</span> ${r.x}<br><span>Margen:</span> ${r.y>0?'+':''}${r.y}%<br><span>Volatilidad:</span> ${r.vol}%`)]
+});
+
+scatterChartVol = new Chart(document.getElementById('chartScatterVol'), {
+  type:'scatter',
+  data:{ datasets: buildScatterVolDatasets(scatter) },
+  options:{ plugins:{ legend:{ display:true, labels:{ color:'#9a7c5f', font:{family:'Barlow Condensed',size:10,weight:'600'}, boxWidth:8, padding:8 } }, tooltip:{enabled:false}, 'custom-tooltip':{} },
+    scales:{ x:{...CFG.scales.x, title:{display:true,text:'Volatilidad (%)',color:'#9a7c5f',font:{family:'Barlow Condensed',size:10,weight:'600'}}},
+             y:{...CFG.scales.y, title:{display:true,text:'pricePremium (%)',color:'#9a7c5f',font:{family:'Barlow Condensed',size:10,weight:'600'}}, ticks:{...CFG.scales.y.ticks, callback:v=>v+'%'}} } },
+  plugins:[makeTooltipPlugin(r=>`<strong>${r.item}</strong><span>Marca:</span> ${r.brand}<br><span>Volatilidad:</span> ${r.x}%<br><span>Margen:</span> ${r.y>0?'+':''}${r.y}%`)]
+});
+
+// Vol by brand bar
+new Chart(document.getElementById('chartVolBrand'), {
+  type:'bar',
+  data:{ labels: brands.map(b=>b.brand),
+    datasets:[{ data: brands.map(b=>b.avg_vol),
+      backgroundColor: brands.map(b=>brandColor(b.brand)+'cc'),
+      borderColor: brands.map(b=>brandColor(b.brand)),
+      borderWidth:1, borderRadius:8 }]},
+  options:{...CFG, plugins:{...CFG.plugins, tooltip:{enabled:true,...TT, callbacks:{ label: ctx=>`${ctx.raw.toFixed(2)}% volatilidad prom.`} } },
+    scales:{...CFG.scales, y:{...CFG.scales.y, ticks:{...CFG.scales.y.ticks, callback: v=>v+'%'} }} }
+});
+
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const brand = btn.dataset.brand;
+    const data = filteredData(brand);
+    scatterChartSales.data.datasets = buildScatterDatasets(data);
+    scatterChartSales.update();
+    scatterChartVol.data.datasets = buildScatterVolDatasets(data);
+    scatterChartVol.update();
+  });
+});
+
+// ── QUADRANT ─────────────────────────────────────────────────────────────────
+const medPremium = 19.8, medVol = 13.2;
+const quadDatasets = buildScatterVolDatasets(scatter).map(ds=>({
+  ...ds,
+  data: ds.data.map(p=>{
+    let color;
+    if(p.y >= medPremium && p.x <= medVol)      color='rgba(22,163,74,.7)';
+    else if(p.y >= medPremium && p.x > medVol)  color='rgba(249,115,22,.7)';
+    else if(p.y < medPremium && p.x <= medVol)  color='rgba(37,99,235,.7)';
+    else                                          color='rgba(220,38,38,.7)';
+    return { ...p, _color: color };
+  }),
+  backgroundColor: ctx => ctx.raw?._color || brandColor(ds.label)+'88',
+  pointRadius:5, pointHoverRadius:8,
+}));
+
+new Chart(document.getElementById('chartQuadrant'), {
+  type:'scatter',
+  data:{ datasets: quadDatasets },
+  options:{ plugins:{ legend:{display:true, labels:{color:'#9a7c5f', font:{family:'Barlow Condensed',size:10,weight:'600'}, boxWidth:8, padding:8}},
+    tooltip:{enabled:false}, 'custom-tooltip':{} },
+    scales:{ x:{...CFG.scales.x, title:{display:true,text:'Volatilidad (%)',color:'#9a7c5f',font:{family:'Barlow Condensed',size:10,weight:'600'}}},
+             y:{...CFG.scales.y, title:{display:true,text:'pricePremium (%)',color:'#9a7c5f',font:{family:'Barlow Condensed',size:10,weight:'600'}}, ticks:{...CFG.scales.y.ticks, callback:v=>v+'%'}} } },
+  plugins:[makeTooltipPlugin(r=>`<strong>${r.item}</strong><span>Marca:</span> ${r.brand}<br><span>Volatilidad:</span> ${r.x}%<br><span>Margen:</span> ${r.y>0?'+':''}${r.y}%`)]
+});
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('page-'+tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
